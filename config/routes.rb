@@ -15,5 +15,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :questions
+  resources :questions do
+    collection do
+      get '/me', to: 'questions#user_questions'
+    end
+  end
+
+  resources :answers
 end

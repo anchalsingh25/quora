@@ -1,6 +1,6 @@
 class QuestionsController < ApplicationController
   before_action :set_question, only: %i[update destroy]
-  before_action :user_auth, only: %i[create update destroy]
+  before_action :user_auth, only: %i[create update destroy user_questions]
 
   def create
     question = Question.new(question_param)
@@ -13,6 +13,13 @@ class QuestionsController < ApplicationController
   def index
     questions = Question.all
     render json: questions
+  end
+
+  def user_questions
+    questions = @current_user.questions
+    return render json: { message: 'no question created' }, status: :ok if questions.size.zero?
+
+    render json: questions, status: :ok
   end
 
   def show
