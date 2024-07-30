@@ -44,15 +44,6 @@ class QuestionsController < ApplicationController
     render status: :no_content
   end
 
-  def set_user_id
-    @user_id = @current_user.id
-  end
-
-  def set_question
-    @question = Question.find(params[:id])
-    return render json: { message: 'Question not found' }, status: :not_found if @question.nil?
-  end
-
   private
 
   def set_question
