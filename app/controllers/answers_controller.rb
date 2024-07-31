@@ -3,7 +3,7 @@ class AnswersController < ApplicationController
   before_action :set_answer, only: %i[update destroy]
 
   def index
-    render json: Answer.all, state: :ok
+    render json: Answer.all, status: :created
   end
 
   def create
@@ -24,9 +24,6 @@ class AnswersController < ApplicationController
                     status: :unauthorized
     end
 
-    answer = Answer.find_by(question_id: answer_params[:question_id])
-    return render json: { message: 'Your answer not found' }, status: :not_found if answer.nil?
-
     @answer.update(answer_params)
     render json: @answer, status: :ok
   end
@@ -36,9 +33,6 @@ class AnswersController < ApplicationController
       return render json: { message: 'not authorized to delete the answer' },
                     status: :unauthorized
     end
-
-    answer = Answer.find_by(question_id: answer_params[:question_id])
-    return render json: { message: 'Your answer not found' }, status: :not_found if answer.nil?
 
     @answer.destroy
     render json: @answer, status: :no_content
