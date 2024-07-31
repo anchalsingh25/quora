@@ -1,15 +1,14 @@
 class AnswersController < ApplicationController
   before_action :user_auth, only: %i[create update destroy]
   before_action :set_answer, only: %i[update destroy]
+  before_action :set_message, only: %i[update destroy]
+  before_action :check_question_presence, only: %i[create update destroy]
 
   def index
-    render json: Answer.all, status: :created
+    render json: Answer.all, status: :ok
   end
 
   def create
-    question = Question.find_by(id: answer_params[:question_id])
-    return render json: { message: 'question not found' }, status: :not_found if question.nil?
-
     answer = Answer.new(answer_params)
     answer.user_id = @current_user.id
     answer.question_id = question.id
@@ -19,26 +18,36 @@ class AnswersController < ApplicationController
   end
 
   def update
-    if @answer.user_id != @current_user.id
-      return render json: { message: 'not authorized to update the answer' },
-                    status: :unauthorized
-    end
+    return render json: { message: @message }, status: :unauthorized if @message.present?
 
     @answer.update(answer_params)
     render json: @answer, status: :ok
   end
 
   def destroy
-    if @answer.user_id != @current_user.id
-      return render json: { message: 'not authorized to delete the answer' },
-                    status: :unauthorized
-    end
+    return render json: { message: @message }, status: :unauthorized if @message.present?
 
     @answer.destroy
     render json: @answer, status: :no_content
   end
 
   private
+
+  def check_question_presence
+    question = Question.find_by(id: answer_params[:question_id])
+    return render json: { message: 'question not found' }, status: :not_found if question.nil?
+  end
+
+  def set_message
+    return unless @answer.user_id != @current_user.id
+
+    @message = case action_name
+               when 'update'
+                 'Not authorized to update the answer'
+               when 'destroy'
+                 'Not authorized to delete the answer'
+               end
+  end
 
   def set_answer
     @answer = Answer.find(params[:id])

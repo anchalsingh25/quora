@@ -1,6 +1,7 @@
 class QuestionsController < ApplicationController
   before_action :set_question, only: %i[update destroy]
   before_action :user_auth, only: %i[create update destroy user_questions]
+  before_action :set_message, only: %i[update destroy]
 
   def create
     question = Question.new(question_param)
@@ -28,10 +29,7 @@ class QuestionsController < ApplicationController
   end
 
   def update
-    if @question.user_id != @current_user.id
-      return render json: { message: 'Not authorized to update the question' },
-                    status: :unauthorized
-    end
+    return render json: { message: @message }, status: :unauthorized if @message.present?
 
     unless @question.update(question_param)
       return render json: { message: 'Question updation failed' },
@@ -42,16 +40,24 @@ class QuestionsController < ApplicationController
   end
 
   def destroy
-    if @question.user_id != @current_user.id
-      return render json: { message: 'Not authorized to delete the question' },
-                    status: :unauthorized
-    end
+    return render json: { message: @message }, status: :unauthorized if @message.present?
 
     @question.destroy
     render status: :no_content
   end
 
   private
+
+  def set_message
+    return unless @question.user_id != @current_user.id
+
+    @message = case action_name
+               when 'update'
+                 'Not authorized to update the question'
+               when 'destroy'
+                 'Not authorized to delete the question'
+               end
+  end
 
   def set_question
     @question = Question.find(params[:id])
