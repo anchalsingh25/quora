@@ -22,6 +22,7 @@ class QuestionsController < ApplicationController
   def show
     answers = @question.answers.includes(:user).map do |answer|
       {
+        answer_id: answer.id,
         description: answer.explanation,
         written_by: answer.user.name,
         created_at: answer.created_at

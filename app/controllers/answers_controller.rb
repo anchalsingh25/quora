@@ -14,7 +14,7 @@ class AnswersController < ApplicationController
   end
 
   def update
-    unless @answer.update(answer_params[:explanation])
+    unless @answer.update(explanation: answer_params[:explanation])
       return render json: { message: @answer.errors.full_messages },
                     status: :unprocessable_entity
     end
