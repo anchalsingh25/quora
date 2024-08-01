@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  before_action :user_auth, only: [:logout]
+  before_action :user_auth, only: %i[logout delete_current_user]
 
   def register
     user = User.new(user_params)
@@ -22,8 +22,17 @@ class UsersController < ApplicationController
 
   def logout
     token = request.headers['Authorization'].split(' ')[1]
-    BlacklistToken.create(token: token)
+    BlacklistToken.create(token:)
     render json: { message: 'successfully logged out' }, status: :ok
+  end
+
+  def delete_current_user
+    unless @current_user.destroy
+      return render json: { message: @user.errors.full_messages },
+                    status: :unprocessable_entity
+    end
+
+    render json: { message: 'Your account deleted successfully' }, status: :ok
   end
 
   private

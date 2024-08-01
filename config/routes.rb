@@ -12,8 +12,15 @@ Rails.application.routes.draw do
       post :register
       post :login
       delete :logout
+      delete '/me', to: 'users#delete_current_user'
     end
   end
 
-  resources :questions
+  resources :questions do
+    collection do
+      get '/me', to: 'questions#user_questions'
+    end
+  end
+
+  resources :answers, except: %i[index show]
 end
