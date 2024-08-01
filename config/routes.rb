@@ -7,11 +7,12 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "articles#index"
 
-  resources :users, only: [:destroy] do
+  resources :users, only: [] do
     collection do
       post :register
       post :login
       delete :logout
+      delete '/me', to: 'users#delete_current_user'
     end
   end
 
@@ -21,5 +22,5 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :answers
+  resources :answers, except: %i[index show]
 end

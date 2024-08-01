@@ -16,18 +16,18 @@ class QuestionsController < ApplicationController
   end
 
   def user_questions
-    questions = @current_user.questions
-    if questions.empty?
-      render json: [], status: :ok
-    else
-      render json: questions, status: :ok
-    end
+    render json: @current_user.questions, status: :ok
   end
 
   def show
-    answer = @question.answers
-    answer_array = Array(answer)
-    render json: { question: @question, answer: answer_array }, status: :ok
+    answers = @question.answers.includes(:user).map do |answer|
+      {
+        description: answer.explanation,
+        written_by: answer.user.name,
+        created_at: answer.created_at
+      }
+    end
+    render json: { question: @question.title, answers: }, status: :ok
   end
 
   def update
@@ -50,22 +50,18 @@ class QuestionsController < ApplicationController
   private
 
   def validate_owner
-    return unless @question.user_id != @current_user.id
-
     message = case action_name
               when 'update'
                 'Not authorized to update the question'
               when 'destroy'
                 'Not authorized to delete the question'
               end
-    render json: { message: }, status: :unauthorized
+    return render json: { message: }, status: :unauthorized if @answer.user_id != @current_user.id
   end
 
   def set_question
     @question = Question.find_by(id: params[:id])
-    return unless @question.nil?
-
-    render json: { message: 'Question not found' }, status: :not_found
+    render json: { message: 'Question not found' }, status: :not_found if @question.nil?
   end
 
   def question_param
