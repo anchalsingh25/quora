@@ -23,4 +23,6 @@ Rails.application.routes.draw do
   end
 
   resources :answers, except: %i[index show]
+
+  resources :comments
 end

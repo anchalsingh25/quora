@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_07_30_161907) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_02_043208) do
   create_table "answers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "explanation", null: false
     t.bigint "user_id", null: false
@@ -25,6 +25,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_30_161907) do
     t.string "token"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "comments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.text "content"
+    t.bigint "user_id", null: false
+    t.bigint "answer_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["answer_id"], name: "index_comments_on_answer_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
   create_table "questions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -46,5 +56,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_07_30_161907) do
 
   add_foreign_key "answers", "questions"
   add_foreign_key "answers", "users"
+  add_foreign_key "comments", "answers"
+  add_foreign_key "comments", "users"
   add_foreign_key "questions", "users"
 end
