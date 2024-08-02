@@ -11,6 +11,7 @@ class CommentsController < ApplicationController
   def index
     comments = Comment.where(answer_id: params[:answer_id]).includes(:user).map do |comment|
       {
+        id: comment.id,
         comment: comment.content,
         user_name: comment.user.name
       }
