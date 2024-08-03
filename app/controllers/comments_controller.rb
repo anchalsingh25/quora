@@ -9,11 +9,12 @@ class CommentsController < ApplicationController
   end
 
   def index
-    comments = Comment.where(answer_id: params[:answer_id]).includes(:user).map do |comment|
+    comments = Comment.where(answer_id: params[:answer_id]).includes(:user, :likes).map do |comment|
       {
         id: comment.id,
         comment: comment.content,
-        user_name: comment.user.name
+        user_name: comment.user.name,
+        liked_count: comment.likes.count
       }
     end
     render json: comments, status: :ok

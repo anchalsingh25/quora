@@ -20,11 +20,12 @@ class QuestionsController < ApplicationController
   end
 
   def show
-    answers = @question.answers.includes(:user).map do |answer|
+    answers = @question.answers.includes(:user, :likes).map do |answer|
       {
         answer_id: answer.id,
         description: answer.explanation,
         written_by: answer.user.name,
+        liked_count: answer.likes.count,
         created_at: answer.created_at
       }
     end

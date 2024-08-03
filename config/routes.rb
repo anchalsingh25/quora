@@ -19,5 +19,13 @@ Rails.application.routes.draw do
   end
 
   resources :answers, except: %i[index show]
+
   resources :comments, except: %i[show update]
+
+  resources :likes, only: [:create] do
+    collection do
+      delete :unlike
+    end
+  end
+  
 end
