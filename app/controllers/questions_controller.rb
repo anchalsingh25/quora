@@ -20,6 +20,7 @@ class QuestionsController < ApplicationController
   end
 
   def show
+    # TODO: send like count with each answer
     answers = @question.answers.includes(:user).map do |answer|
       {
         answer_id: answer.id,

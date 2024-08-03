@@ -9,6 +9,7 @@ class CommentsController < ApplicationController
   end
 
   def index
+    # TODO: send like count with each comment
     comments = Comment.where(answer_id: params[:answer_id]).includes(:user).map do |comment|
       {
         id: comment.id,
