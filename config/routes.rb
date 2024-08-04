@@ -18,7 +18,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :answers, except: %i[index show]
+  resources :answers, except: %i[show]
 
   resources :comments, except: %i[show update]
 
