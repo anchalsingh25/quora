@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  RECOVERY_TIME = 30.days
+
   has_many :questions
   has_many :answers
   has_many :comments
@@ -8,19 +10,19 @@ class User < ApplicationRecord
   validates :email_id, presence: true, uniqueness: true
   validates :password, length: { minimum: 8 }
 
-  def deleted?
-    deleted_at.present?
+  def permanently_deleted?
+    return false if deleted_at.nil?
+
+    deleted_at + RECOVERY_TIME < DateTime.now
   end
 
   def display_name
-    deleted? ? 'deleted_user' : name
+    deleted_at.present? ? 'Deleted User' : name
   end
 
-  def can_be_restored?
-    deleted? && deleted_at >= 30.days.ago
-  end
+  def temporarily_deleted?
+    return false if deleted_at.nil?
 
-  def restore
-    can_be_restored? && update_column(:deleted_at, nil)
+    deleted_at + RECOVERY_TIME >= DateTime.now
   end
 end

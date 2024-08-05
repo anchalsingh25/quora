@@ -26,16 +26,6 @@ class ApplicationController < ActionController::API
     @current_user = decode_token if @current_user.nil?
     return render json: { message: 'please log in' }, status: :unauthorized if @current_user.nil?
 
-    if @current_user.deleted?
-      if @current_user.deleted_at >= 30.days.ago
-        render json: { message: 'Your account was deleted recently. Please restore' },
-               status: :unauthorized
-      else
-        render json: { message: 'Your account has been deleted and cannot be accessed' }, status: :unauthorized
-      end
-      return
-    end
-
     @current_user
   end
 end

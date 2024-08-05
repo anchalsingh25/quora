@@ -1,15 +1,10 @@
 Rails.application.routes.draw do
-  get 'questions/show'
-  get 'questions/update'
-  get 'questions/destroy'
-
   resources :users, only: [] do
     collection do
       post :register
       post :login
       delete :logout
       delete '/me', to: 'users#delete_current_user'
-      post :recover_account
     end
   end
 
@@ -28,5 +23,4 @@ Rails.application.routes.draw do
       delete :unlike
     end
   end
-  
 end

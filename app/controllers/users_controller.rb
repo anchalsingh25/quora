@@ -11,10 +11,13 @@ class UsersController < ApplicationController
 
   def login
     user = User.find_by(email_id: user_params[:email_id])
-    if user.nil? || user.deleted? || !user.authenticate(user_params[:password])
+
+    if user.nil? || user.permanently_deleted? || !user.authenticate(user_params[:password])
       return render json: { message: 'unauthorized access' },
                     status: :unauthorized
     end
+
+    user.update_column(:deleted_at, nil) if user.temporarily_deleted?
 
     token = encode_token(user_id: user.id)
     render json: { message: 'user logged in', token: }, status: :ok
@@ -26,23 +29,13 @@ class UsersController < ApplicationController
     render json: { message: 'successfully logged out' }, status: :ok
   end
 
-  def recover_account
-    user = User.find_by(email_id: user_params[:email_id])
-    return render json: { message: 'User not found' }, status: :not_found if user.nil?
-
-    unless user.restore
-      return render json: { message: 'Your account cannot be restored' },
-                    status: :unprocessable_entity
-    end
-
-    render json: { message: 'Your account is successfully restored' }, status: :ok
-  end
-
   def delete_current_user
     unless @current_user.update_column(:deleted_at, Time.now)
       return render json: { message: @current_user.errors.full_messages },
                     status: :unprocessable_entity
     end
+    token = request.headers['Authorization'].split(' ')[1]
+    BlacklistToken.create(token:)
     render json: { message: 'Your account deleted successfully' }, status: :ok
   end
 
