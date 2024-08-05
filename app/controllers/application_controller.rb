@@ -1,13 +1,13 @@
 class ApplicationController < ActionController::API
   def encode_token(payload)
     exp = Time.now.to_i + 12 * 3600
-    JWT.encode(payload.merge(exp: exp), 'anchalsecretkey')
+    JWT.encode(payload.merge(exp:), 'anchalsecretkey')
   end
 
   def decode_token
     header = request.headers['Authorization']
     return unless header
-    
+
     token = header.split(' ')[1]
     return nil if BlacklistToken.find_by(token:).present?
 
@@ -25,6 +25,16 @@ class ApplicationController < ActionController::API
   def user_auth
     @current_user = decode_token if @current_user.nil?
     return render json: { message: 'please log in' }, status: :unauthorized if @current_user.nil?
+
+    if @current_user.deleted?
+      if @current_user.deleted_at >= 30.days.ago
+        render json: { message: 'Your account was deleted recently. Please restore' },
+               status: :unauthorized
+      else
+        render json: { message: 'Your account has been deleted and cannot be accessed' }, status: :unauthorized
+      end
+      return
+    end
 
     @current_user
   end

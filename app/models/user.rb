@@ -15,4 +15,12 @@ class User < ApplicationRecord
   def display_name
     deleted? ? 'deleted_user' : name
   end
+
+  def can_be_restored?
+    deleted? && deleted_at >= 30.days.ago
+  end
+
+  def restore
+    can_be_restored? && update_column(:deleted_at, nil)
+  end
 end

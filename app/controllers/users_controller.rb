@@ -11,7 +11,7 @@ class UsersController < ApplicationController
 
   def login
     user = User.find_by(email_id: user_params[:email_id])
-    if user.nil? || !user.authenticate(user_params[:password])
+    if user.nil? || user.deleted? || !user.authenticate(user_params[:password])
       return render json: { message: 'unauthorized access' },
                     status: :unauthorized
     end
@@ -26,12 +26,23 @@ class UsersController < ApplicationController
     render json: { message: 'successfully logged out' }, status: :ok
   end
 
-  def delete_current_user
-    unless @current_user.destroy
-      return render json: { message: @user.errors.full_messages },
+  def recover_account
+    user = User.find_by(email_id: user_params[:email_id])
+    return render json: { message: 'User not found' }, status: :not_found if user.nil?
+
+    unless user.restore
+      return render json: { message: 'Your account cannot be restored' },
                     status: :unprocessable_entity
     end
 
+    render json: { message: 'Your account is successfully restored' }, status: :ok
+  end
+
+  def delete_current_user
+    unless @current_user.update_column(:deleted_at, Time.now)
+      return render json: { message: @current_user.errors.full_messages },
+                    status: :unprocessable_entity
+    end
     render json: { message: 'Your account deleted successfully' }, status: :ok
   end
 

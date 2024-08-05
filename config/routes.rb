@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       post :login
       delete :logout
       delete '/me', to: 'users#delete_current_user'
+      post :recover_account
     end
   end
 
