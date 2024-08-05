@@ -4,9 +4,10 @@ class AnswersController < ApplicationController
   before_action :validate_owner, only: %i[update destroy]
 
   def index
-    per_page = params[:per_page].to_i || 10
+    per_page = (params[:per_page] || 10).to_i
     per_page = 10 if per_page > 20
     page = (params[:page] || 1).to_i
+    page = 1 if page < 1
 
     answers = Answer.includes(comments: %i[user likes]).paginate(page:, per_page:)
     answer_and_comments = answers.map do |answer|
@@ -17,6 +18,7 @@ class AnswersController < ApplicationController
         most_liked_comment: if most_liked_comment.present?
                               {
                                 comment_id: most_liked_comment.id,
+                                name: most_liked_comment.user.display_name,
                                 comment: most_liked_comment.content,
                                 liked_count: most_liked_comment.likes.count
                               }

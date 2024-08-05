@@ -11,9 +11,10 @@ class QuestionsController < ApplicationController
   end
 
   def index
-    per_page = params[:per_page].to_i || 10
+    per_page = (params[:per_page] || 10).to_i
     per_page = 10 if per_page > 20
     page = (params[:page] || 1).to_i
+    page = 1 if page < 1
 
     questions = Question.includes(answers: %i[user likes]).paginate(page:, per_page:)
 
@@ -26,7 +27,7 @@ class QuestionsController < ApplicationController
                              {
                                answer_id: most_liked_answer.id,
                                description: most_liked_answer.explanation,
-                               written_by: most_liked_answer.user.name,
+                               written_by: most_liked_answer.user.display_name,
                                liked_count: most_liked_answer.likes.size,
                                created_at: most_liked_answer.created_at
                              }
