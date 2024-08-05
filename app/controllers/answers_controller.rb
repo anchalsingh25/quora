@@ -1,7 +1,39 @@
 class AnswersController < ApplicationController
-  before_action :user_auth
+  before_action :user_auth, except: %i[index]
   before_action :set_answer, only: %i[update destroy]
   before_action :validate_owner, only: %i[update destroy]
+
+  def index
+    per_page = params[:per_page].to_i || 10
+    per_page = 10 if per_page > 20
+    page = (params[:page] || 1).to_i
+
+    answers = Answer.includes(comments: %i[user likes]).paginate(page:, per_page:)
+    answer_and_comments = answers.map do |answer|
+      most_liked_comment = answer.comments.max_by { |comment| comment.likes.size }
+      {
+        answer_id: answer.id,
+        answer: answer.explanation,
+        most_liked_comment: if most_liked_comment.present?
+                              {
+                                comment_id: most_liked_comment.id,
+                                comment: most_liked_comment.content,
+                                liked_count: most_liked_comment.likes.count
+                              }
+                            end
+      }
+    end
+
+    meta = {
+      total_number_of_pages: answers.total_pages,
+      current_page: answers.current_page,
+      number_of_record_in_current_page: answers.length,
+      previous_page_exist: answers.previous_page.present?,
+      next_page_exist: answers.next_page.present?
+    }
+
+    render json: { answer: answer_and_comments, metadata: meta }, status: :ok
+  end
 
   def create
     question = Question.find_by(id: answer_params[:question_id])

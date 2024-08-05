@@ -34,14 +34,15 @@ class QuestionsController < ApplicationController
       }
     end
 
-    render json: {
-      questions: questions_and_answers,
+    meta = {
       total_number_of_pages: questions.total_pages,
       current_page: questions.current_page,
       number_of_record_in_current_page: questions.length,
       next_page_exist: questions.next_page.present?,
       previous_page_exist: questions.previous_page.present?
     }
+
+    render json: { data: questions_and_answers, metadata: meta }, status: :ok
   end
 
   def user_questions
