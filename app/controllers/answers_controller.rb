@@ -9,32 +9,25 @@ class AnswersController < ApplicationController
     page = (params[:page] || 1).to_i
     page = 1 if page < 1
 
-    answers = Answer.includes(comments: %i[user likes]).paginate(page:, per_page:)
-    answer_and_comments = answers.map do |answer|
-      most_liked_comment = answer.comments.max_by { |comment| comment.likes.size }
+    answer_per_page = Answer.includes(:user).paginate(page:, per_page:)
+
+    answers = answer_per_page.map do |answer|
       {
         answer_id: answer.id,
-        answer: answer.explanation,
-        most_liked_comment: if most_liked_comment.present?
-                              {
-                                comment_id: most_liked_comment.id,
-                                name: most_liked_comment.user.display_name,
-                                comment: most_liked_comment.content,
-                                liked_count: most_liked_comment.likes.count
-                              }
-                            end
+        explanation: answer.explanation,
+        user: answer.user.name
       }
     end
 
     meta = {
-      total_number_of_pages: answers.total_pages,
-      current_page: answers.current_page,
-      number_of_record_in_current_page: answers.length,
-      previous_page_exist: answers.previous_page.present?,
-      next_page_exist: answers.next_page.present?
+      total_number_of_pages: answer_per_page.total_pages,
+      current_page: answer_per_page.current_page,
+      number_of_record_in_current_page: answer_per_page.length,
+      previous_page_exist: answer_per_page.previous_page.present?,
+      next_page_exist: answer_per_page.next_page.present?
     }
 
-    render json: { answer: answer_and_comments, metadata: meta }, status: :ok
+    render json: { answer: answers, metadata: meta }, status: :ok
   end
 
   def create

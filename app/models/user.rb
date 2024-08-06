@@ -10,7 +10,7 @@ class User < ApplicationRecord
   validates :email_id, presence: true, uniqueness: true
   validates :password, length: { minimum: 8 }
 
-  def permanently_deleted?
+  def permanently_deleted?a
     return false if deleted_at.nil?
 
     deleted_at + RECOVERY_TIME < DateTime.now
