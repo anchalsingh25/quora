@@ -1,8 +1,4 @@
 Rails.application.routes.draw do
-  get 'questions/show'
-  get 'questions/update'
-  get 'questions/destroy'
-
   resources :users, only: [] do
     collection do
       post :register
@@ -18,7 +14,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :answers, except: %i[index show]
+  resources :answers, except: %i[show]
 
   resources :comments, except: %i[show update]
 
@@ -27,5 +23,4 @@ Rails.application.routes.draw do
       delete :unlike
     end
   end
-  
 end

@@ -11,8 +11,39 @@ class QuestionsController < ApplicationController
   end
 
   def index
-    questions = Question.all
-    render json: questions
+    per_page = (params[:per_page] || 10).to_i
+    per_page = 10 if per_page > 20
+    page = (params[:page] || 1).to_i
+    page = 1 if page < 1
+
+    questions = Question.includes(answers: %i[user likes]).paginate(page:, per_page:)
+
+    questions_and_answers = questions.map do |question|
+      most_liked_answer = question.answers.max_by { |answer| answer.likes.size }
+      {
+        question_id: question.id,
+        question_title: question.title,
+        most_liked_answer: if most_liked_answer.present?
+                             {
+                               answer_id: most_liked_answer.id,
+                               description: most_liked_answer.explanation,
+                               written_by: most_liked_answer.user.display_name,
+                               liked_count: most_liked_answer.likes.size,
+                               created_at: most_liked_answer.created_at
+                             }
+                           end
+      }
+    end
+
+    meta = {
+      total_number_of_pages: questions.total_pages,
+      current_page: questions.current_page,
+      number_of_record_in_current_page: questions.length,
+      next_page_exist: questions.next_page.present?,
+      previous_page_exist: questions.previous_page.present?
+    }
+
+    render json: { data: questions_and_answers, metadata: meta }, status: :ok
   end
 
   def user_questions
@@ -20,16 +51,7 @@ class QuestionsController < ApplicationController
   end
 
   def show
-    answers = @question.answers.includes(:user, :likes).map do |answer|
-      {
-        answer_id: answer.id,
-        description: answer.explanation,
-        written_by: answer.user.name,
-        liked_count: answer.likes.count,
-        created_at: answer.created_at
-      }
-    end
-    render json: { question: @question.title, answers: }, status: :ok
+    render json: @question, status: :ok
   end
 
   def update

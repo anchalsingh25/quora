@@ -1,7 +1,34 @@
 class AnswersController < ApplicationController
-  before_action :user_auth
+  before_action :user_auth, except: %i[index]
   before_action :set_answer, only: %i[update destroy]
   before_action :validate_owner, only: %i[update destroy]
+
+  def index
+    per_page = (params[:per_page] || 10).to_i
+    per_page = 10 if per_page > 20
+    page = (params[:page] || 1).to_i
+    page = 1 if page < 1
+
+    answer_per_page = Answer.includes(:user).paginate(page:, per_page:)
+
+    answers = answer_per_page.map do |answer|
+      {
+        answer_id: answer.id,
+        explanation: answer.explanation,
+        user: answer.user.name
+      }
+    end
+
+    meta = {
+      total_number_of_pages: answer_per_page.total_pages,
+      current_page: answer_per_page.current_page,
+      number_of_record_in_current_page: answer_per_page.length,
+      previous_page_exist: answer_per_page.previous_page.present?,
+      next_page_exist: answer_per_page.next_page.present?
+    }
+
+    render json: { answer: answers, metadata: meta }, status: :ok
+  end
 
   def create
     question = Question.find_by(id: answer_params[:question_id])

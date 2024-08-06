@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::API
   def encode_token(payload)
-    JWT.encode(payload, 'anchalsecretkey')
+    exp = Time.now.to_i + 12 * 3600
+    JWT.encode(payload.merge(exp:), 'anchalsecretkey')
   end
 
   def decode_token
@@ -14,6 +15,8 @@ class ApplicationController < ActionController::API
       decoded_token = JWT.decode(token, 'anchalsecretkey')
       user_id = decoded_token[0]['user_id']
       User.find_by(id: user_id)
+    rescue JWT::ExpiredSignature
+      nil
     rescue JWT::DecodeError
       nil
     end
