@@ -2,8 +2,22 @@ class UsersController < ApplicationController
   before_action :user_auth, only: %i[logout delete_current_user]
 
   def register
-    user = User.new(user_params)
-    return render json: { message: user.errors }, status: :unprocessable_entity unless user.save
+    user = User.find_by(email_id: user_params[:email_id])
+
+    if user.present?
+      if user.temporarily_deleted? || user.deleted_at.nil?
+        return render json: { message: 'user already exist' },
+                      status: :unprocessable_entity
+      end
+
+      user.reassign_data_to_dummy_user
+      user.update(user_params.merge(deleted_at: nil))
+    end
+
+    if user.nil?
+      user = User.new(user_params)
+      return render json: { message: user.errors }, status: :unprocessable_entity unless user.save
+    end
 
     token = encode_token(user_id: user.id)
     render json: { name: user.name, email_id: user.email_id, token: }, status: :created

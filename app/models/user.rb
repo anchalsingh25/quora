@@ -25,4 +25,12 @@ class User < ApplicationRecord
 
     deleted_at + RECOVERY_TIME >= DateTime.now
   end
+
+  def reassign_data_to_dummy_user
+    @dummy_user = User.find_by(email_id: 'dummy@example.com') if @dummy_user.nil?
+    questions.update_all(user_id: @dummy_user.id)
+    answers.update_all(user_id: @dummy_user.id)
+    comments.update_all(user_id: @dummy_user.id)
+    likes.update_all(user_id: @dummy_user.id)
+  end
 end

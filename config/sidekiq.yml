@@ -1,0 +1,6 @@
+:scheduler:
+  :schedule:
+    reassign_and_delete_user:
+      cron: "0 0 29 * *"  
+      class: "ReassignAndDeleteUserWorker"
+      queue: default

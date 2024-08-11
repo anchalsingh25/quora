@@ -48,5 +48,8 @@ group :development do
   # gem "spring"
   gem "byebug"
   gem 'will_paginate'
+  gem 'sidekiq'
 end
 
+
+gem "sidekiq-scheduler", "~> 5.0"
