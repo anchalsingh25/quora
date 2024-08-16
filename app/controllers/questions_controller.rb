@@ -2,6 +2,7 @@ class QuestionsController < ApplicationController
   before_action :user_auth, except: %i[index show]
   before_action :set_question, only: %i[update destroy show]
   before_action :validate_owner, only: %i[update destroy]
+  before_action :check_restriction, only: %i[create]
 
   def create
     question = Question.new(question_param.merge(user_id: @current_user.id))

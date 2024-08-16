@@ -2,6 +2,7 @@ class AnswersController < ApplicationController
   before_action :user_auth, except: %i[index]
   before_action :set_answer, only: %i[update destroy]
   before_action :validate_owner, only: %i[update destroy]
+  before_action :check_restriction, only: %i[create]
 
   def index
     per_page = (params[:per_page] || 10).to_i

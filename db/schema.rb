@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_08_05_061121) do
+ActiveRecord::Schema[7.0].define(version: 2024_08_15_131245) do
   create_table "answers", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "explanation", null: false
     t.bigint "user_id", null: false
@@ -47,6 +47,15 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_05_061121) do
     t.index ["user_id"], name: "index_likes_on_user_id"
   end
 
+  create_table "punishments", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "punishment_type"
+    t.datetime "restriction_time"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_punishments_on_user_id"
+  end
+
   create_table "questions", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "title"
     t.string "description"
@@ -56,6 +65,21 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_05_061121) do
     t.index ["user_id"], name: "index_questions_on_user_id"
   end
 
+  create_table "reports", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+    t.string "reportable_type", null: false
+    t.bigint "reportable_id", null: false
+    t.bigint "reportee_id", null: false
+    t.bigint "reporter_id", null: false
+    t.integer "category"
+    t.text "reason"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reportable_type", "reportable_id"], name: "index_reports_on_reportable"
+    t.index ["reportee_id"], name: "index_reports_on_reportee_id"
+    t.index ["reporter_id"], name: "index_reports_on_reporter_id"
+  end
+
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.string "name"
     t.string "email_id"
@@ -63,6 +87,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_05_061121) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
+    t.integer "role"
   end
 
   add_foreign_key "answers", "questions"
@@ -70,5 +95,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_08_05_061121) do
   add_foreign_key "comments", "answers"
   add_foreign_key "comments", "users"
   add_foreign_key "likes", "users"
+  add_foreign_key "punishments", "users"
   add_foreign_key "questions", "users"
+  add_foreign_key "reports", "users", column: "reportee_id"
+  add_foreign_key "reports", "users", column: "reporter_id"
 end

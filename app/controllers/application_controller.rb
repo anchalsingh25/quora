@@ -28,4 +28,17 @@ class ApplicationController < ActionController::API
 
     @current_user
   end
+
+  def check_restriction
+    last_punishment = @current_user.punishments.last
+    return unless last_punishment&.restricted?
+
+    render json: { message: 'You are temporarily restricted from accessing this feature.' }, status: :forbidden
+  end
+
+  def user_role_reviewer?
+    return if @current_user.reviewer?
+
+    render json: { message: 'You are not a reviewer' }, status: :forbidden
+  end
 end

@@ -23,4 +23,6 @@ Rails.application.routes.draw do
       delete :unlike
     end
   end
+  resources :reports, except: %i[show destroy]
+  resources :punishments, only: %i[index create]
 end
