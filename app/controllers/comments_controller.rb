@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   before_action :user_auth
+  before_action :check_restriction, only: %i[create]
 
   def create
     comment = Comment.create(comment_params.merge(user_id: @current_user.id))

@@ -23,4 +23,7 @@ Rails.application.routes.draw do
       delete :unlike
     end
   end
+
+  resources :reports
+  resources :punishments
 end

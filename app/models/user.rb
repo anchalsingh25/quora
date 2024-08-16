@@ -5,10 +5,16 @@ class User < ApplicationRecord
   has_many :answers
   has_many :comments
   has_many :likes
+  has_many :reportee, class_name: 'Report', foreign_key: 'reportee_id', dependent: :destroy
+  has_many :reporter, class_name: 'Report', foreign_key: 'reporter_id', dependent: :destroy
+  has_many :punishments, dependent: :destroy
+
   has_secure_password
   validates :name, presence: true
   validates :email_id, presence: true, uniqueness: true
   validates :password, length: { minimum: 8 }
+
+  enum role: %i[user admin reviewer]
 
   def permanently_deleted?
     return false if deleted_at.nil?
