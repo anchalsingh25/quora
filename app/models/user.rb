@@ -5,8 +5,8 @@ class User < ApplicationRecord
   has_many :answers
   has_many :comments
   has_many :likes
-  has_many :reportee, class_name: 'Report', foreign_key: 'reportee_id', dependent: :destroy
-  has_many :reporter, class_name: 'Report', foreign_key: 'reporter_id', dependent: :destroy
+  has_many :received_reports, class_name: 'Report', foreign_key: 'reportee_id', dependent: :destroy
+  has_many :reports, class_name: 'Report', foreign_key: 'reporter_id', dependent: :destroy
   has_many :punishments, dependent: :destroy
 
   has_secure_password
@@ -14,7 +14,7 @@ class User < ApplicationRecord
   validates :email_id, presence: true, uniqueness: true
   validates :password, length: { minimum: 8 }
 
-  enum role: %i[user admin reviewer]
+  enum role: %i[user admin reviewer], default: 0
 
   def permanently_deleted?
     return false if deleted_at.nil?

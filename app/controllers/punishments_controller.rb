@@ -1,6 +1,6 @@
 class PunishmentsController < ApplicationController
   before_action :user_auth
-  before_action :is_reviewer
+  before_action :user_role_reviewer?
   before_action :check_restriction, except: %i[index]
 
   def index
@@ -16,7 +16,7 @@ class PunishmentsController < ApplicationController
 
     last_punishment = user.punishments.last
 
-    if last_punishment&.restricted_access? && last_punishment.restriction_time > Time.current
+    if last_punishment&.restricted?
       return render json: { message: 'User is already serving a restricted access period.' },
                     status: :unprocessable_entity
     end
@@ -30,10 +30,6 @@ class PunishmentsController < ApplicationController
   end
 
   private
-
-  def is_reviewer
-    return render json: { message: 'You are not reviewer' } if @current_user.role != 'reviewer'
-  end
 
   def filter_params
     filter = {}

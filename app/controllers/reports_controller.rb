@@ -1,5 +1,6 @@
 class ReportsController < ApplicationController
-  before_action :user_auth, except: %i[index]
+  before_action :user_auth
+  before_action :user_role_reviewer?, only: %i[index]
 
   def index
     reports = Report.includes(:reporter, :reportee)
@@ -13,7 +14,7 @@ class ReportsController < ApplicationController
           status: report.status,
           reporter_email: report.reporter.email_id,
           reportee_email: report.reportee.email_id,
-          resource: report.reportable_type
+          resource: report.reportable
         }
       end
     }
@@ -35,13 +36,10 @@ class ReportsController < ApplicationController
     end
 
     resource = report_params[:reportable_type].constantize.find_by(id: report_params[:reportable_id])
-
     reportee = resource&.user
-
     return render json: { message: "You can't report yourself" }, status: :unauthorized if reportee == @current_user
 
     report = Report.new(report_params.merge(reporter_id: @current_user.id, reportee:))
-
     return render json: { errors: report.errors.full_messages }, status: :unprocessable_entity unless report.save
 
     render json: { data: { message: 'Report created' } }, status: :created

@@ -7,7 +7,7 @@ class Report < ApplicationRecord
 
   enum :category, %i[spam harassment inappropriate_content other], default: :spam, validate: true
 
-  enum :status, %i[pending resolved]
+  enum :status, %i[pending resolved], default: 0
 
   validates :reporter_id,
             uniqueness: { scope: %i[reportable_id reportable_type], message: "You've already reported this item" }
