@@ -49,7 +49,9 @@ group :development do
   gem "byebug"
   gem 'will_paginate'
   gem 'sidekiq'
+  gem 'dotenv-rails'
+  
 end
 
-
 gem "sidekiq-scheduler", "~> 5.0"
+gem "mailtrap"

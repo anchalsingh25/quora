@@ -15,7 +15,7 @@ class PunishmentsController < ApplicationController
 
     last_punishment = user.punishments.last
 
-    if last_punishment&.restricted? || last_punishment&.permanent_ban
+    if last_punishment&.restricted? || last_punishment&.permanent_ban?
       return render json: { message: 'User is already serving a restricted access period.' },
                     status: :unprocessable_entity
     end
@@ -25,6 +25,7 @@ class PunishmentsController < ApplicationController
 
     return render json: { errors: report.errors.full_messages }, status: :unprocessable_entity unless punishment.save
 
+    UserMailer.with(name: user.name, email: user.email_id).ban_email.deliver_later if punishment.permanent_ban?
     render json: { data: { message: 'user is punished' } }, status: :created
   end
 
