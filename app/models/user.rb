@@ -14,7 +14,7 @@ class User < ApplicationRecord
   validates :email_id, presence: true, uniqueness: true
   validates :password, length: { minimum: 8 }
 
-  enum role: %i[user admin reviewer], default: 0
+  enum user_role: %i[user admin reviewer]
 
   def permanently_deleted?
     return false if deleted_at.nil?

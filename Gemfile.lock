@@ -85,6 +85,10 @@ GEM
     debug (1.9.2)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    dotenv (3.1.2)
+    dotenv-rails (3.1.2)
+      dotenv (= 3.1.2)
+      railties (>= 6.1)
     erubi (1.13.0)
     et-orbi (1.2.11)
       tzinfo
@@ -109,6 +113,7 @@ GEM
       net-imap
       net-pop
       net-smtp
+    mailtrap (2.1.0)
     marcel (1.0.4)
     method_source (1.1.0)
     mini_mime (1.1.5)
@@ -203,7 +208,9 @@ DEPENDENCIES
   bootsnap
   byebug
   debug
+  dotenv-rails
   jwt
+  mailtrap
   mysql2 (~> 0.5)
   puma (~> 5.0)
   rails (~> 7.0.8, >= 7.0.8.4)

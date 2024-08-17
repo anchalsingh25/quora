@@ -1,9 +1,9 @@
 # Creating Users
 users = User.create!([
-                       { name: 'Alice', email_id: 'alice@example.com', password: 'password123', role: 'reviewer' },
-                       { name: 'Bob', email_id: 'bob@example.com', password: 'password123', role: 'user' },
-                       { name: 'Charlie', email_id: 'charlie@example.com', password: 'password123', role: 'user' },
-                       { name: 'Dave', email_id: 'dave@example.com', password: 'password123', role: 'admin' }
+                       { name: 'Alice', email_id: 'alice@example.com', password: 'password123', user_role: 'reviewer' },
+                       { name: 'Bob', email_id: 'bob@example.com', password: 'password123', user_role: 'user' },
+                       { name: 'Charlie', email_id: 'charlie@example.com', password: 'password123', user_role: 'user' },
+                       { name: 'Dave', email_id: 'dave@example.com', password: 'password123', user_role: 'admin' }
                      ])
 
 # Creating Questions

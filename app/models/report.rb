@@ -5,9 +5,8 @@ class Report < ApplicationRecord
   belongs_to :reportee, class_name: 'User', foreign_key: 'reportee_id'
   belongs_to :reporter, class_name: 'User', foreign_key: 'reporter_id'
 
-  enum :category, %i[spam harassment inappropriate_content other], default: :spam, validate: true
-
-  enum :status, %i[pending resolved], default: 0
+  enum category: %i[spam harassment inappropriate_content other]
+  enum status: %i[pending resolved]
 
   validates :reporter_id,
             uniqueness: { scope: %i[reportable_id reportable_type], message: "You've already reported this item" }
